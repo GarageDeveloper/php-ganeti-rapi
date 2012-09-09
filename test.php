@@ -23,8 +23,28 @@ use ganeti\rapi;
 
 // Change the IP address with the one of your ganeti cluster
 $cli = new ganeti\rapi\GanetiRapiClient('127.0.0.1');
-    # Does not work:
-print "RAPI Version: ".var_dump($cli->getVersion())."\n";
+    # Works ok although it's not json encoded in the server response
+print "RAPI Version:\n";
+var_dump($cli->getVersion());
     # Works ok:
-print "RAPI Features: ".var_dump($cli->getFeatures())."\n";
+print "RAPI Features:\n";
+var_dump($cli->getFeatures());
+
+print "RAPI OperatingSystems:\n";
+var_dump($cli->getOperatingSystems());
+
+print "RAPI GetInfo():\n";
+var_dump($cli->getInfo());
+
+print "RAPI GetTags():\n";
+var_dump($cli->getClusterTags());
+
+print "RAPI GetInstances():\n";
+var_dump($cli->getInstances());
+
+print "RAPI GetInstances(bulk=true):\n";
+var_dump($cli->getInstances(TRUE));
+
+print "RAPI GetInstance(\"sandbox.myprivatedomain.priv\"):\n";
+var_dump($cli->getInstance("sandbox.myprivatedomain.priv"));
 

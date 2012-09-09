@@ -31,12 +31,40 @@ assert_options(ASSERT_ACTIVE, 1);
 
 class GanetiRapiClient
 {
+    const GANETI_RAPI_VERSION = 2;
+    const USER_AGENT = 'PHP Ganeti RAPI Client';
+    const HTTP_DELETE = "DELETE";
+    const HTTP_GET = "GET";
+    const HTTP_PUT = "PUT";
+    const HTTP_POST = "POST";
+    const HTTP_OK = 200;
+    const HTTP_NOT_FOUND = 404;
+    const HTTP_APP_JSON = "application/json";
+    const REPLACE_DISK_PRI = "replace_on_primary";
+    const REPLACE_DISK_SECONDARY = "replace_on_secondary";
+    const REPLACE_DISK_CHG = "replace_new_secondary";
+    const REPLACE_DISK_AUTO = "replace_auto";
+    const NODE_EVAC_PRI = "primary-only";
+    const NODE_EVAC_SEC = "secondary-only";
+    const NODE_EVAC_ALL = "all";
+    const NODE_ROLE_DRAINED = "drained";
+    const NODE_ROLE_MASTER_CANDIATE = "master-candidate";
+    const NODE_ROLE_MASTER = "master";
+    const NODE_ROLE_OFFLINE = "offline";
+    const NODE_ROLE_REGULAR = "regular";
+    const JOB_STATUS_QUEUED = "queued";
+    const JOB_STATUS_WAITING = "waiting";
+    const JOB_STATUS_CANCELING = "canceling";
+    const JOB_STATUS_RUNNING = "running";
+    const JOB_STATUS_CANCELED = "canceled";
+    const JOB_STATUS_SUCCESS = "success";
+    const JOB_STATUS_ERROR = "error";
+
     private $host;
     private $port;
     private $username;
     private $password;
     private $baseUrl;
-    public static $USER_AGENT = 'PHP Ganeti RAPI Client';
 
     // function GanetiRapiClient($host, $port=5080, $username=NULL,
     function __construct($host, $port=5080, $username=NULL,
@@ -80,13 +108,12 @@ class GanetiRapiClient
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, FALSE);
         curl_setopt($ch, CURLOPT_MAXREDIRS, 5);
         curl_setopt($ch, CURLOPT_NOSIGNAL, TRUE);
-        //TODO: FIX THIS curl_setopt($ch, CURLOPT_USERAGENT, $self::USER_AGENT);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'PHP GANETI RAPI CLIENT');
+        curl_setopt($ch, CURLOPT_USERAGENT, self::USER_AGENT);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                    "Accept: application/json",
-                    "Content-Type: application/json",
+                    "Accept: ".self::HTTP_APP_JSON,
+                    "Content-Type: ".self::HTTP_APP_JSON,
                     ));
         # TODO: reproduce assert from client.py
 
@@ -112,6 +139,17 @@ class GanetiRapiClient
 
     private static function encodeQuery($query) {
         # TODO: please code me
+        $result = array();
+        /* while (list($name,$value) = each($query)) {
+        //foreach ($query as $e) {
+            list($name,$value) = $e;
+            print "name: $name\n";
+            print "value: $value\n";
+        }
+        */
+        // TOERASE:
+        $result = $query;
+        return $result;
     }
 
     private function sendRequest($method,$path,$query=NULL,$content=NULL) {
@@ -148,11 +186,10 @@ class GanetiRapiClient
         $urlParts = array($this->baseUrl,$path);
         if (!is_null($query)) {
             array_push($urlParts,'?');
-            array_push($urlParts,urlencode($this->encodeQuery($query)));
+            array_push($urlParts,http_build_query($this->encodeQuery($query)));
         }
 
         $url = implode($urlParts);
-        print "$url\n";
 
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "".$method);
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -184,9 +221,8 @@ class GanetiRapiClient
             $responseContent = $response;
         
 
-        if ($httpCode != 200) {
+        if ($httpCode != self::HTTP_OK) {
             # TODO: code explode in case of a dict response
-            var_dump($responseContent);
             $msg = $responseContent;
             #TODO: code GanetiApiError throw new Exception('GANETI API error '.$msg,
                                 # $code = $httpCode);
@@ -196,11 +232,84 @@ class GanetiRapiClient
     }
 
     public function getVersion() {
-        return $this->sendRequest("GET", "/version");
+        return $this->sendRequest(self::HTTP_GET, "/version");
     }
 
     public function getFeatures() {
         # TODO: add checks as they are written in the client.py
-        return $this->sendRequest("GET", "/2/features");
+        return $this->sendRequest(self::HTTP_GET, "/".self::GANETI_RAPI_VERSION."/features");
     }
+
+    public function getOperatingSystems() {
+        return $this->sendRequest(self::HTTP_GET,
+                                  "/".self::GANETI_RAPI_VERSION."/os",
+                                  NULL,NULL);
+    }
+
+    public function getInfo() {
+        return $this->sendRequest(self::HTTP_GET,
+                                  "/".self::GANETI_RAPI_VERSION."/info",
+                                  NULL,NULL);
+    }
+
+    public function redistributeConfig() {
+        return $this->sendRequest(self::HTTP_PUT,
+                                  "/".self::GANETI_RAPI_VERSION."/redistribute-config",
+                                  NULL,NULL);
+    }
+
+    public function modifyCluster($body=array()) {
+        return $this->sendRequest(self::HTTP_PUT,
+                                  "/".self::GANETI_RAPI_VERSION."/modify",
+                                  NULL,$body);
+    }
+
+    public function getClusterTags() {
+        return $this->sendRequest(self::HTTP_GET,
+                                  "/".self::GANETI_RAPI_VERSION."/tags",
+                                  NULL,NULL);
+    }
+
+    public function addClusterTags($tags,$dryRun=FALSE) {
+        // TODO: please code me
+        /*return $this->sendRequest(self::HTTP_PUT,
+                                  "/".self::GANETI_RAPI_VERSION."/tags",
+                                  $query,NULL);
+        */
+    }
+
+    public function deleteClusterTags($tags,$dryRun=FALSE) {
+        // TODO: please code me
+        /*return $this->sendRequest(self::HTTP_DELETE,
+                                  "/".self::GANETI_RAPI_VERSION."/tags",
+                                  $query,NULL);
+        */
+    }
+
+    public function getInstances($bulk=FALSE) {
+        $query=array();
+        if ($bulk)
+            $query["bulk"] = 1;
+        $instances = $this->sendRequest(self::HTTP_GET,
+                                        "/".self::GANETI_RAPI_VERSION."/instances",
+                                        $query,NULL); 
+        if ($bulk)
+            return $instances;
+        else {
+            // TODO: please CHECK ME
+            // return [i["id"] for i in instances]
+            //print_r($instances);
+            $result=array();
+            foreach ($instances as $i) {
+               array_push($result,$i->id);
+            }
+            return $result;
+        }
+    }
+
+    public function getInstance($instance) {
+        return $this->sendRequest(self::HTTP_GET,
+                                  "/".self::GANETI_RAPI_VERSION."/instances/".$instance,
+                                  NULL,NULL); 
+    } 
 }
