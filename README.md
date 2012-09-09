@@ -9,7 +9,7 @@ Goals:
 - should be object oriented and reusable easily
 
 What's done:
-<code>
+<pre><code>
     public function getVersion() - OK
     public function getFeatures() - OK
     public function getOperatingSystems() - OK
@@ -21,7 +21,7 @@ What's done:
     public function deleteClusterTags - TO BE CODED/TESTED
     public function getInstances($bulk=FALSE) - OK
     public function getInstance($instance) - OK
-</code>
+</code></pre>
    
 All other methods are not written at the moment.
 <pre>
