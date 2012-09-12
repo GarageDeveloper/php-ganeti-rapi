@@ -316,4 +316,21 @@ class GanetiRapiClient
                                   "/".self::GANETI_RAPI_VERSION."/instances/".$instance,
                                   NULL,NULL); 
     } 
+
+
+    public function rebootInstance($instance, $rebootType = NULL,
+                                    $ignoreSecondaries = NULL,
+                                    $dryRun = NULL) {
+        $query=array();
+        if ($rebootType)
+            $query["type"] = $rebootType;
+        if ($ignoreSecondaries)
+            $query["ignore_secondaries"] = $ignoreSecondaries;
+        if ($dryRun)
+            $query["dry-run"] = 1;
+        return $this->sendRequest(self::HTTP_POST,
+                                  "/".self::GANETI_RAPI_VERSION."/instances/".$instance."/reboot",
+                                  $query,NULL); 
+
+    }
 }
