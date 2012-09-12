@@ -21,6 +21,11 @@ What's done:
     public function deleteClusterTags - TO BE CODED/TESTED
     public function getInstances($bulk=FALSE) - OK
     public function getInstance($instance) - OK
+    public function rebootInstance($instance, $rebootType = NULL,
+                                    $ignoreSecondaries = NULL,
+                                    $dryRun = FALSE) - OK
+    public function shutdownInstance($instance,$dryRun = FALSE,
+                                   $noRemember = FALSE) - OK
 </code></pre>
    
 All other methods are not written at the moment.
@@ -35,8 +40,6 @@ All other methods are not written at the moment.
   def GetInstanceTags(self, instance):
   def AddInstanceTags(self, instance, tags, dry_run=False):
   def DeleteInstanceTags(self, instance, tags, dry_run=False):
-  def RebootInstance(self, instance, reboot_type=None,
-  def ShutdownInstance(self, instance, dry_run=False,
   def StartupInstance(self, instance, dry_run=False, no_remember=False):
   def ReinstallInstance(self, instance, os=None, no_startup=False,
   def ReplaceInstanceDisks(self, instance, disks=None,
