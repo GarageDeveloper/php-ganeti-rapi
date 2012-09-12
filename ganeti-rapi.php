@@ -222,8 +222,12 @@ class GanetiRapiClient
         
 
         if ($httpCode != self::HTTP_OK) {
-            # TODO: code explode in case of a dict response
-            $msg = $responseContent;
+            if (gettype($responseContent) == 'object') {
+                $msg = $responseContent->code." ".
+                       $responseContent->message.": ".
+                       $responseContent->explain;
+            } else
+                $msg = $responseContent;
             #TODO: code GanetiApiError throw new Exception('GANETI API error '.$msg,
                                 # $code = $httpCode);
             throw new \Exception('GANETI API error '.$msg);
