@@ -320,7 +320,7 @@ class GanetiRapiClient
 
     public function rebootInstance($instance, $rebootType = NULL,
                                     $ignoreSecondaries = NULL,
-                                    $dryRun = NULL) {
+                                    $dryRun = FALSE) {
         $query=array();
         if ($rebootType)
             $query["type"] = $rebootType;
@@ -332,5 +332,17 @@ class GanetiRapiClient
                                   "/".self::GANETI_RAPI_VERSION."/instances/".$instance."/reboot",
                                   $query,NULL); 
 
+    }
+
+    public function shutdownInstance($instance,$dryRun = FALSE,
+                                   $noRemember = FALSE) {
+        $query=array();
+        if ($dryRun)
+            $query["dry-run"] = 1;
+        if ($noRemember)
+            $query["no-remember"] = 1;
+        return $this->sendRequest(self::HTTP_PUT,
+                                  "/".self::GANETI_RAPI_VERSION."/instances/".$instance."/shutdown",
+                                  $query,NULL); 
     }
 }
