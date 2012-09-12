@@ -48,3 +48,8 @@ var_dump($cli->getInstances(TRUE));
 print "RAPI GetInstance(\"sandbox.myprivatedomain.priv\"):\n";
 var_dump($cli->getInstance("sandbox.myprivatedomain.priv"));
 
+print "RAPI RebootInstance(\"sandbox.myprivatedomain.priv\"):\n";
+var_dump($cli->rebootInstance("sandbox.myprivatedomain.priv"));
+
+print "RAPI ShutdownInstance(\"sandbox.myprivatedomain.priv\"):\n";
+var_dump($cli->shutdownInstance("sandbox.myprivatedomain.priv"));
