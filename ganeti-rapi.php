@@ -317,6 +317,17 @@ class GanetiRapiClient
                                   NULL,NULL); 
     } 
 
+    public function getInstanceInfo($instance, $static=NULL) {
+        $query=array();
+        if ($rebootType)
+            $query["static"] = $static;
+        else
+            $query = NULL;
+        return $this->sendRequest(self::HTTP_GET,
+                                  "/".self::GANETI_RAPI_VERSION."/instances/".$instance."/info",
+                                  $query,NULL); 
+    }
+
 
     public function rebootInstance($instance, $rebootType = NULL,
                                     $ignoreSecondaries = NULL,
@@ -343,6 +354,13 @@ class GanetiRapiClient
             $query["no-remember"] = 1;
         return $this->sendRequest(self::HTTP_PUT,
                                   "/".self::GANETI_RAPI_VERSION."/instances/".$instance."/shutdown",
+                                  $query,NULL); 
+    }
+
+
+    public function getJobStatus($jobId) {
+        return $this->sendRequest(self::HTTP_GET,
+                                  "/".self::GANETI_RAPI_VERSION."/jobs/".$jobId,
                                   $query,NULL); 
     }
 }

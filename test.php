@@ -53,3 +53,16 @@ var_dump($cli->rebootInstance("sandbox.myprivatedomain.priv"));
 
 print "RAPI ShutdownInstance(\"sandbox.myprivatedomain.priv\"):\n";
 var_dump($cli->shutdownInstance("sandbox.myprivatedomain.priv"));
+
+print "RAPI getInstanceInfo example:\n";
+$instanceName = "sandbox.myprivatedomain.priv";
+$jobid=$cli->getInstanceInfo($instanceName);
+$res = $cli->getJobStatus($jobid);
+while ($res->status == "running"){
+    $res = $cli->getJobStatus($jobid);
+    usleep(2000);
+}
+$opresult=(array)$res->opresult[0];
+print $opresult[$instanceName]->pnode.":".$opresult[$instanceName]->network_port."\n";
+
+
