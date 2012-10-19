@@ -57,12 +57,22 @@ var_dump($cli->shutdownInstance("sandbox.myprivatedomain.priv"));
 print "RAPI getInstanceInfo example:\n";
 $instanceName = "sandbox.myprivatedomain.priv";
 $jobid=$cli->getInstanceInfo($instanceName);
-$res = $cli->getJobStatus($jobid);
-while ($res->status == "running"){
-    $res = $cli->getJobStatus($jobid);
-    usleep(2000);
+if($cli->waitForJobCompletion($jobid)) {
+    $opresult=(array)$res->opresult[0];
+    print $opresult[$instanceName]->pnode.":".$opresult[$instanceName]->network_port."\n";
+} else {
+    print "Something went wrong... Job $jobid failed"
 }
-$opresult=(array)$res->opresult[0];
-print $opresult[$instanceName]->pnode.":".$opresult[$instanceName]->network_port."\n";
 
+var_dump($cli->getInstanceConsole("sandbox.myprivatedomain.priv"));
+
+var_dump($cli->getJobs());
+
+$instanceName = "sandbox.myprivatedomain.priv";
+$jobid=$cli->getInstanceInfo($instanceName);
+var_dump($cli->waitForJobCompletion($jobid));
+
+$instanceName = "sandbox.myprivatedomain.priv";
+$jobid=$cli->getInstanceInfo($instanceName);
+var_dump($cli->cancelJob($jobid));
 

@@ -59,6 +59,11 @@ class GanetiRapiClient
     const JOB_STATUS_CANCELED = "canceled";
     const JOB_STATUS_SUCCESS = "success";
     const JOB_STATUS_ERROR = "error";
+    private static $JOB_STATUS_FINALIZED = array(
+        JOB_STATUS_CANCELED => JOB_STATUS_CANCELED,
+        JOB_STATUS_SUCCESS => JOB_STATUS_SUCCESS,
+        JOB_STATUS_ERROR => JOB_STATUS_ERROR,
+        );
 
     private $host;
     private $port;
@@ -357,10 +362,53 @@ class GanetiRapiClient
                                   $query,NULL); 
     }
 
+    public function getInstanceConsole($instance) {
+        return $this->sendRequest(self::HTTP_GET,
+                                  "/".self::GANETI_RAPI_VERSION."/instances/".$instance."/console",
+                                  NULL,NULL); 
+    }
+
+    public function getJobs() {
+        $jobs = $this->sendRequest(self::HTTP_GET,
+                                  "/".self::GANETI_RAPI_VERSION."/jobs",
+                                  NULL,NULL); 
+        $result=array();
+        foreach ($jobs as $i) {
+            array_push($result,$i->id);
+        }
+        return $result;
+    }
 
     public function getJobStatus($jobId) {
         return $this->sendRequest(self::HTTP_GET,
                                   "/".self::GANETI_RAPI_VERSION."/jobs/".$jobId,
                                   $query,NULL); 
     }
+
+    public function waitForJobCompletion($jobId,$period=5,$retries=-1) {
+        while($retries != 0) {
+            $jobRes = $this->getJobStatus($jobId);
+            if($jobRes && $jobRes->status == self::JOB_STATUS_SUCCESS) {
+                return TRUE;
+            } elseif (!$jobRes ||
+                           in_array($jobRes->status,self::$JOB_STATUS_FINALIZED)) {
+                return FALSE;
+            }
+            if ($period)
+                sleep($period);
+            if ($retries > 0)
+                $retries--;
+        }
+        return FALSE;
+    }
+
+    public function cancelJob($jobId, $dryRun = FALSE) {
+        $query=array();
+        if ($dryRun)
+            $query["dry-run"] = 1;
+        return $this->sendRequest(self::HTTP_DELETE,
+                                  "/".self::GANETI_RAPI_VERSION."/jobs/".$jobId,
+                                  $query,NULL); 
+    }
+
 }

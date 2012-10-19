@@ -26,6 +26,12 @@ What's done:
                                     $dryRun = FALSE) - OK
     public function shutdownInstance($instance,$dryRun = FALSE,
                                    $noRemember = FALSE) - OK
+
+    public function getInstanceConsole($instance) - OK
+    public function getJobs() - OK
+    public function getJobStatus($jobId) - OK
+    public function waitForJobCompletion($jobId,$period=5,$retries=-1) - OK
+    public function cancelJob($jobId, $dryRun = FALSE) - OK
 </code></pre>
    
 All other methods are not written at the moment.
@@ -48,12 +54,7 @@ All other methods are not written at the moment.
   def MigrateInstance(self, instance, mode=None, cleanup=None):
   def FailoverInstance(self, instance, iallocator=None,
   def RenameInstance(self, instance, new_name, ip_check=None,
-  def GetInstanceConsole(self, instance):
-  def GetJobs(self):
-  def GetJobStatus(self, job_id):
-  def WaitForJobCompletion(self, job_id, period=5, retries=-1):
   def WaitForJobChange(self, job_id, fields, prev_job_info,
-  def CancelJob(self, job_id, dry_run=False):
   def GetNodes(self, bulk=False):
   def GetNode(self, node):
   def EvacuateNode(self, node, iallocator=None, remote_node=None,
